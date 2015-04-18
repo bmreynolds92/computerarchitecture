@@ -3,7 +3,7 @@
 
 `timescale 1ns/100ps
 
-module ctrl (CLK, RST_F, OPCODE, MM, STAT, RF_WE, ALU_OP, WB_SEL, RD_SEL, PC_WRITE, PC_SEL, PC_RST, BR_SEL );
+module ctrl (CLK, RST_F, OPCODE, MM, STAT, RF_WE, ALU_OP, WB_SEL, RD_SEL, PC_SEL, PC_WRITE, PC_RST, BR_SEL);
   
   /* TODO: Declare the ports listed above as inputs or outputs */
   input CLK, RST_F;
@@ -13,8 +13,10 @@ module ctrl (CLK, RST_F, OPCODE, MM, STAT, RF_WE, ALU_OP, WB_SEL, RD_SEL, PC_WRI
   
   
   output WB_SEL, RD_SEL, RF_WE;
-  output PC_WRITE, PC_SEL, PC_RST, BR_SEL;  //these are the new lines for part 2
+  output PC_SEL, PC_WRITE, PC_RST, BR_SEL; //part 2 outputs
+  
   reg WB_SEL, RD_SEL, RF_WE;
+  reg PC_SEL, PC_WRITE, PC_RST, BR_SEL; //part 2 registers
   
   output [1:0] ALU_OP;
   reg [1:0] ALU_OP;
@@ -76,15 +78,26 @@ always @ (posedge CLK)
       $stop;
     end
   end
+  
+  // Reset PC
+  always @ (RST_F)
+     begin 
+        if(!RST_F)
+	  PC_RST <=1;
+	else
+	  PC_RST <=0;
+     end	  
     
   /* TODO: Generate outputs based on the FSM states and inputs. For Parts 2 and 3, you will
        add the new control signals here. */
 always@(present_state)
   case(present_state)
     fetch:  begin
+      PC_WRITE <= 1; //set PC_WRITE high during fetch
       
       end
     decode: begin
+      PC_WRITE <= 0; //set PC_WRITE low after fetch
       RF_WE <= 0;
       end
 
@@ -96,20 +109,34 @@ always@(present_state)
       else if (MM == 8) begin
 	ALU_OP <= 2'b01;
       end
+      
+      //part 2 execute
+      if ((OPCODE == bra) || (OPCODE == brr) || (OPCODE == bne)) begin
+        BR_SEL <= 1;
+      else
+        BR_SEL <= 0;
+      end
+      
       end
       
     writeback: begin
-    if (MM == 0 && OPCODE == alu_op) begin
-      RF_WE <= 1;
-      WB_SEL <= 0;
-      RD_SEL <=1;
-      end
-        if (MM == am_imm && OPCODE == alu_op) begin
+      if (MM == 0 && OPCODE == alu_op) begin
 	RF_WE <= 1;
 	WB_SEL <= 0;
-	RD_SEL <=0;
-      end
-      
+	RD_SEL <=1;
+	end
+	  if (MM == am_imm && OPCODE == alu_op) begin
+	  RF_WE <= 1;
+	  WB_SEL <= 0;
+	  RD_SEL <=0;
+	end
+	
+      //part 2 writeback
+      if ((OPCODE == bra) || (OPCODE == brr) || (OPCODE == bne)) begin 
+	PC_SEL <= 1;
+      else
+	PC_SEL <= 0;
+	
       
       end
       
