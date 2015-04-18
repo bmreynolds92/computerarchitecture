@@ -7,12 +7,20 @@ module sisc( CLK, RST_F, IR);
    //datapath signals
    wire [31:0] IR, RSA, RSB, ALU_RESULT, WB_DATA;
    wire [3:0] CC, WT_REG; 
+   //datapath for part2
+   wire [15:0] PC_INC; //output for pc as pc_inc, input for br as pc_inc
+   wire [15:0] PC_OUT; //output for pc as pc_out, input for im as read_addr
+   wire [15:0] BR_ADDR;  //output for br as br_addr, input for pc as br_addr
+   wire [31:0] READ_DATA;  //output of IM as read_data, bits [15:0] input to BR as imm
+
 
    //control signals
    wire RD_SEL, WB_SEL, RF_WE, STAT_EN;
    wire [31:0] MUX32_0;
    wire [3:0] STAT;
    wire [1:0] ALU_OP;
+   //control signals for part2
+   wire PC_SEL, PC_EN, PC_RST, BR_SEL;
 
    assign MUX32_0 = 32'b11111111111111110001111111111111;
    //instantiate modules
@@ -42,9 +50,23 @@ module sisc( CLK, RST_F, IR);
 		.rsa (RSA), 
 		.rsb (RSB) );
 
-   statreg my_statreg( .in (CC), .enable (STAT_EN), .out(STAT) );
+   statreg my_statreg(  .in (CC), 
+			.enable (STAT_EN), 
+			.out(STAT) );
 
-   ctrl my_ctrl( .CLK (CLK), .RST_F (RST_F), .OPCODE (IR[31:28]), .MM (IR[27:24]), .STAT (STAT), .RF_WE (RF_WE), .ALU_OP (ALU_OP), .WB_SEL (WB_SEL), .RD_SEL (RD_SEL) );
+   ctrl my_ctrl(.CLK (CLK), 
+		.RST_F (RST_F), 
+		.OPCODE (IR[31:28]), 
+		.MM (IR[27:24]), 
+		.STAT (STAT), 
+		.RF_WE (RF_WE), 
+		.ALU_OP (ALU_OP), 
+		.WB_SEL (WB_SEL), 
+		.RD_SEL (RD_SEL) );
+
+//modules for part2
+
+
 
    //monitor signals IR, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
    
