@@ -1,11 +1,10 @@
 // 55:035 sisc project part 1
 
-module sisc( CLK, RST_F, IR);
+module sisc( CLK, RST_F );
    input CLK, RST_F;
-   input [31:0] IR;
 
    //datapath signals
-   wire [31:0] IR, RSA, RSB, ALU_RESULT, WB_DATA;
+   wire [31:0] RSA, RSB, ALU_RESULT, WB_DATA;
    wire [3:0] CC, WT_REG; 
    //datapath for part2
    wire [15:0] PC_INC; //output for pc as pc_inc, input for br as pc_inc
@@ -26,14 +25,14 @@ module sisc( CLK, RST_F, IR);
    //instantiate modules
    alu my_alu( 	.rsa (RSA), 
 		.rsb (RSB), 
-		.imm (IR[15:0]), 
+		.imm (READ_DATA[15:0]), 
 		.alu_op (ALU_OP),
         	.alu_result (ALU_RESULT), 
 		.stat (CC), 
 		.stat_en (STAT_EN) );
 
-   mux4 my_mux4(.in_a (IR[19:16]), 
-		.in_b (IR[15:12]), 
+   mux4 my_mux4(.in_a (READ_DATA[19:16]), 
+		.in_b (READ_DATA[15:12]), 
 		.sel (RD_SEL), 
 		.out (WT_REG) );
 
@@ -42,8 +41,8 @@ module sisc( CLK, RST_F, IR);
 			.sel (WB_SEL), 
 			.out (WB_DATA) );
 
-   rf my_rf(	.read_rega (IR[23:20]), 
-		.read_regb (IR[19:16]), 
+   rf my_rf(	.read_rega (READ_DATA[23:20]), 
+		.read_regb (READ_DATA[19:16]), 
 		.write_reg (WT_REG) ,
        		.write_data (WB_DATA), 
 		.rf_we (RF_WE), 
@@ -56,8 +55,8 @@ module sisc( CLK, RST_F, IR);
 
    ctrl my_ctrl(.CLK (CLK), 
 		.RST_F (RST_F), 
-		.OPCODE (IR[31:28]), 
-		.MM (IR[27:24]), 
+		.OPCODE (READ_DATA[31:28]), 
+		.MM (READ_DATA[27:24]), 
 		.STAT (STAT), 
 		.RF_WE (RF_WE), 
 		.ALU_OP (ALU_OP), 
@@ -86,17 +85,16 @@ module sisc( CLK, RST_F, IR);
 		.read_data 	(READ_DATA)  //output
 		);
 
-   //monitor signals IR, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
-   
-   initial begin
-   	my_rf.ram_array[1] <= 32'b00001111000011110000111100001111;
-   	my_rf.ram_array[2] <= 32'b00000000000000000000000000000011;
-   	end
+   //monitor signals READ_DATA, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
+  initial begin
+	my_rf.ram_array[1] <=32'b00001111000011110000111100001111;
+	my_rf.ram_array[2] <=32'b0000000000000000000000000000011; 
+	end
    initial 
       begin
 
-         $monitor( $time,,,,  "IR[31:0] = %b, R1 = %b, R2 = %b, R3 = %b, RD_SEL = %b,ALU_OP = %b,  WB_SEL = %b, RF_WE = %b, WB_DATA = %b, MM= %b, ALU_Result = %b",
-          IR, my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , IR[27:24], ALU_RESULT
+         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %b, R1 = %b\n\t R2 = %b, R3 = %b\n\t, IMMediate = %b\n\t  RD_SEL = %b, ALU_OP = %b,  WB_SEL = %b\n\t, RF_WE = %b, WB_DATA = %b\n\t, MM= %b, ALU_Result = %b\n\t, PC_WRITE = %b,  PC_SEL = %b,  PC_RST = %b,  BR_SEL = %b\n\t BR_ADDR= %b,  PC_OUT  aka READ_ADDR= %b,  PC_INC = %b\n\t   READ_DATA = %b\n\n",
+          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA
                     );
 end
 endmodule
