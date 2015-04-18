@@ -93,16 +93,19 @@ always @ (posedge CLK)
 always@(present_state)
   case(present_state)
     fetch:  begin
+	$display("in case fetch");
       PC_WRITE <= 1; //set PC_WRITE high during fetch
       
       end
     decode: begin
+	$display("in case decode");
       PC_WRITE <= 0; //set PC_WRITE low after fetch
       RF_WE <= 0;
       end
 
 
     execute: begin
+	$display("in case execute");
       if (MM == 0) begin
 	ALU_OP<= 2'b00;
       end
@@ -122,6 +125,7 @@ always@(present_state)
     end
       
     writeback: begin
+	$display("in case writeback");
       if (MM == 0 && OPCODE == alu_op) begin
 	RF_WE <= 1;
 	WB_SEL <= 0;
@@ -130,7 +134,8 @@ always@(present_state)
 	  if (MM == am_imm && OPCODE == alu_op) begin
 	  RF_WE <= 1;
 	  WB_SEL <= 0;
-	  RD_SEL <=0;
+//	  RD_SEL <=0;
+          RD_SEL <=1;
 	end
 	
       //part 2 writeback
