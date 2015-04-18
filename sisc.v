@@ -16,15 +16,31 @@ module sisc( CLK, RST_F, IR);
 
    assign MUX32_0 = 32'b11111111111111110001111111111111;
    //instantiate modules
-   alu my_alu( .rsa (RSA), .rsb (RSB), .imm (IR[15:0]), .alu_op (ALU_OP),
-        .alu_result (ALU_RESULT), .stat (CC), .stat_en (STAT_EN) );
+   alu my_alu( 	.rsa (RSA), 
+		.rsb (RSB), 
+		.imm (IR[15:0]), 
+		.alu_op (ALU_OP),
+        	.alu_result (ALU_RESULT), 
+		.stat (CC), 
+		.stat_en (STAT_EN) );
 
-   mux4 my_mux4( .in_a (IR[19:16]), .in_b (IR[15:12]), .sel (RD_SEL), .out (WT_REG) );
+   mux4 my_mux4(.in_a (IR[19:16]), 
+		.in_b (IR[15:12]), 
+		.sel (RD_SEL), 
+		.out (WT_REG) );
 
-   mux32 my_mux32( .in_a (MUX32_0), .in_b (ALU_RESULT), .sel (WB_SEL), .out (WB_DATA) );
+   mux32 my_mux32(	.in_a (MUX32_0), 
+			.in_b (ALU_RESULT), 
+			.sel (WB_SEL), 
+			.out (WB_DATA) );
 
-   rf my_rf( .read_rega (IR[23:20]), .read_regb (IR[19:16]), .write_reg (WT_REG) ,
-       .write_data (WB_DATA), .rf_we (RF_WE), .rsa (RSA), .rsb (RSB) );
+   rf my_rf(	.read_rega (IR[23:20]), 
+		.read_regb (IR[19:16]), 
+		.write_reg (WT_REG) ,
+       		.write_data (WB_DATA), 
+		.rf_we (RF_WE), 
+		.rsa (RSA), 
+		.rsb (RSB) );
 
    statreg my_statreg( .in (CC), .enable (STAT_EN), .out(STAT) );
 
