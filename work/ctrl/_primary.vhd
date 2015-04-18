@@ -29,8 +29,8 @@ entity ctrl is
         \ALU_OP\        : out    vl_logic_vector(1 downto 0);
         WB_SEL          : out    vl_logic;
         RD_SEL          : out    vl_logic;
-        PC_WRITE        : out    vl_logic;
         PC_SEL          : out    vl_logic;
+        PC_WRITE        : out    vl_logic;
         PC_RST          : out    vl_logic;
         BR_SEL          : out    vl_logic
     );

@@ -113,11 +113,13 @@ always@(present_state)
       //part 2 execute
       if ((OPCODE == bra) || (OPCODE == brr) || (OPCODE == bne)) begin
         BR_SEL <= 1;
+        end
       else
+      begin
         BR_SEL <= 0;
       end
       
-      end
+    end
       
     writeback: begin
       if (MM == 0 && OPCODE == alu_op) begin
@@ -134,6 +136,7 @@ always@(present_state)
       //part 2 writeback
       if ((OPCODE == bra) || (OPCODE == brr) || (OPCODE == bne)) begin 
 	PC_SEL <= 1;
+	end
       else
 	PC_SEL <= 0;
 	
