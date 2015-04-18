@@ -93,8 +93,8 @@ module sisc( CLK, RST_F );
    initial 
       begin
 
-         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %b, R1 = %b\n\t R2 = %b, R3 = %b\n\t, IMMediate = %b\n\t  RD_SEL = %b, ALU_OP = %b,  WB_SEL = %b\n\t, RF_WE = %b, WB_DATA = %b\n\t, MM= %b, ALU_Result = %b\n\t, PC_WRITE = %b,  PC_SEL = %b,  PC_RST = %b,  BR_SEL = %b\n\t BR_ADDR= %b,  PC_OUT  aka READ_ADDR= %b,  PC_INC = %b\n\t   READ_DATA = %b\n\n",
-          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA
+         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %b, R1 = %b\n\t R2 = %b, R3 = %b\n\t, R4 = %b \n\t IMMediate = %b\n\t  RD_SEL = %b, ALU_OP = %b,  WB_SEL = %b\n\t, RF_WE = %b, WB_DATA = %b\n\t, MM= %b, ALU_Result = %b\n\t, PC_WRITE = %b,  PC_SEL = %b,  PC_RST = %b,  BR_SEL = %b\n\t BR_ADDR= %b,  PC_OUT  aka READ_ADDR= %b,  PC_INC = %b\n\t   READ_DATA = %b\n\t RST_F = %b\n\n",
+          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], my_rf.ram_array[4], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA, RST_F
                     );
 end
 endmodule
