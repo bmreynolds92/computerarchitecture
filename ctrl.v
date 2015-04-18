@@ -82,7 +82,7 @@ always @ (posedge CLK)
   // Reset PC
   always @ (RST_F)
      begin 
-        if(!RST_F)
+        if(RST_F == 0)
 	  PC_RST <=1;
 	else
 	  PC_RST <=0;
@@ -114,7 +114,14 @@ always@(present_state)
       end
       
       //part 2 execute
-      if ((OPCODE == bra) || (OPCODE == brr) || (OPCODE == bne)) begin
+      if (( OPCODE == bra || OPCODE == brr || OPCODE == bne)) begin
+	if ( (MM & STAT) == MM ) begin
+		PC_SEL <=1;
+		PC_WRITE <= 1;
+        end
+      end
+
+      if ((OPCODE == bra) || (OPCODE == bne)) begin
         BR_SEL <= 1;
         end
       else
@@ -139,7 +146,7 @@ always@(present_state)
 	end
 	
       //part 2 writeback
-      if ((OPCODE == bra) || (OPCODE == brr) || (OPCODE == bne)) begin 
+      if ((OPCODE == bra) || (OPCODE == bne)) begin 
 	PC_SEL <= 1;
 	end
       else
