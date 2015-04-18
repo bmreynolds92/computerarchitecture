@@ -20,7 +20,7 @@ module sisc( CLK, RST_F, IR);
    wire [3:0] STAT;
    wire [1:0] ALU_OP;
    //control signals for part2
-   wire PC_SEL, PC_EN, PC_RST, BR_SEL;
+   wire PC_SEL, PC_WRITE/*aka PC_EN*/, PC_RST, BR_SEL;
 
    assign MUX32_0 = 32'b11111111111111110001111111111111;
    //instantiate modules
@@ -62,11 +62,29 @@ module sisc( CLK, RST_F, IR);
 		.RF_WE (RF_WE), 
 		.ALU_OP (ALU_OP), 
 		.WB_SEL (WB_SEL), 
-		.RD_SEL (RD_SEL) );
+		.RD_SEL (RD_SEL),  
+		//these are the new lines for part2
+		.PC_WRITE (PC_WRITE),  //aka PC_EN
+		.PC_SEL (PC_SEL),  
+		.PC_RST (PC_RST),
+		.BR_SEL (BR_SEL) );
 
 //modules for part2
+  pc my_pc( 	.br_addr 	(BR_ADDR),  //inputs
+		.pc_sel 	(PC_SEL),
+		.pc_write 	(PC_WRITE),
+		.pc_rst 	(PC_RST),
+		.pc_out 	(PC_OUT),  //outputs
+		.pc_inc 	(PC_INC) );
 
+  br my_br( 	.pc_inc 	(PC_INC),  //inputs
+		.imm 		(READ_DATA[15:0]),
+		.br_sel 	(BR_SEL),
+		.br_addr 	(BR_ADDR) );  //output
 
+  im my_im( 	.read_addr 	(PC_OUT),  //input
+		.read_data 	(READ_DATA)  //output
+		);
 
    //monitor signals IR, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
    
