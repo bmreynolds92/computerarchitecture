@@ -98,47 +98,90 @@ always@(present_state)
     fetch:  begin
 	$display("in case fetch");
       PC_WRITE <= 1; //set PC_WRITE high during fetch
-      
+      PC_SEL <=0;  //inc pc to next instruction
       end
     decode: begin
 	$display("in case decode");
       PC_WRITE <= 0; //set PC_WRITE low after fetch
       RF_WE <= 0;
-      end
+	if(OPCODE == alu_op) begin
+		
+      		if (MM == 0) begin
+			ALU_OP<= 2'b00;
+      		end
+      		else if (MM == am_imm) begin
+			ALU_OP <= 2'b01;
+      		end
+	end
 
-
+	if(OPCODE == brr) begin
+		$display("OPCODE is brr");
+		BR_SEL <= 0;
+	end
+	else begin
+		$display("OPCODE is not brr");
+		BR_SEL <= 1;
+	end
+    end
     execute: begin
 	$display("in case execute");
-      if (MM == 0) begin
-	ALU_OP<= 2'b00;
-      end
-      else if (MM == 8) begin
-	ALU_OP <= 2'b01;
-      end
-      
-      //part 2 execute
-      if (( OPCODE == bra || OPCODE == brr || OPCODE == bne)) begin
-	if ( (MM & STAT) == MM ) begin
+	WB_SEL <=0;
+/*    case(OPCODE)
+	alu_op:  begin
+      		if (MM == 0) begin
+			ALU_OP<= 2'b00;
+      		end
+      		else if (MM == am_imm) begin
+			ALU_OP <= 2'b01;
+      		end
+	end
+    endcase
+  */    //part 2 execute
+      if (( OPCODE == bne)) begin
+	$display("executing branch stuff negative");
+	if ( (MM & STAT) != (MM) ) begin
+		$display("negative condition found, branching");
 		PC_SEL <=1;
-		PC_WRITE <= 1;
+//		PC_WRITE <= 0;
         end
-      end
+        else
+		$display("negative condition not found");
 
-      if ((OPCODE == bra) || (OPCODE == bne)) begin
-        BR_SEL <= 1;
-        end
-      else
-      begin
-        BR_SEL <= 0;
+//	next_state <= fetch;
       end
+      if (( OPCODE == bra || OPCODE == brr )) begin
+	$display("executing branch stuff positive");
+	if ( (MM & STAT) == MM ) begin
+		$display("condition found branching");
+		PC_SEL <=1;
+//		PC_WRITE <= 0;
+        end
+	else begin
+		$display("condition not found");
+	end
+//	next_state <= fetch;
+      end
+//	PC_SEL <= 0;
      
-    end
-    
     //mem do nothing for now
-      
+     end 
     writeback: begin
 	$display("in case writeback");
-      if (MM == 0 && OPCODE == alu_op) begin
+        PC_WRITE <= 0;
+	case(OPCODE)
+	alu_op:	begin
+		WB_SEL <= 0;
+		RF_WE <=1;
+		if (MM == 0)  begin
+			RD_SEL <=1;
+		end
+		else if (MM == am_imm) begin
+			RD_SEL <= 0;
+		end
+	end			  
+    endcase
+/*
+if (MM == 0 && OPCODE == alu_op) begin
 	RF_WE <= 1;
 	WB_SEL <= 0;
 	RD_SEL <=1;
@@ -156,7 +199,7 @@ always@(present_state)
 	end
       else
 	PC_SEL <= 0;
-	
+*/	
       
       end
       

@@ -87,14 +87,14 @@ module sisc( CLK, RST_F );
 
    //monitor signals READ_DATA, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
   initial begin
-	my_rf.ram_array[1] <=32'b00001111000011110000111100001111;
-	my_rf.ram_array[2] <=32'b0000000000000000000000000000011; 
+	my_rf.ram_array[1] <=32'd1;
+	my_rf.ram_array[2] <=32'd0; 
 	end
    initial 
       begin
 
-         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %b, R1 = %b\n\t R2 = %b, R3 = %b\n\t, R4 = %b \n\t IMMediate = %b\n\t  RD_SEL = %b, ALU_OP = %b,  WB_SEL = %b\n\t, RF_WE = %b, WB_DATA = %b\n\t, MM= %b, ALU_Result = %b\n\t, PC_WRITE = %b,  PC_SEL = %b,  PC_RST = %b,  BR_SEL = %b\n\t BR_ADDR= %b,  PC_OUT  aka READ_ADDR= %b,  PC_INC = %b\n\t   READ_DATA = %b\n\t RST_F = %b\n\n",
-          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], my_rf.ram_array[4], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA, RST_F
+         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %h, R1 = %h\n\t R2 = %h, R3 = %h\n\t, R4 = %h \n\t IMMediate = %h\n\t  RD_SEL = %h, ALU_OP = %h,  WB_SEL = %h\n\t, RF_WE = %h, WB_DATA = %h\n\t, MM= %h, ALU_Result = %h\n\t, PC_WRITE = %h,  PC_SEL = %h,  PC_RST = %h,  BR_SEL = %h\n\t BR_ADDR= %h,  PC_OUT  aka READ_ADDR= %h,  PC_INC = %h\n\t   READ_DATA = %h\n\t RST_F = %h\n\t OP_CODE = %h\n\t STAT = %h    STAT_EN = %h\n\n",
+          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], my_rf.ram_array[4], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA, RST_F, READ_DATA[31:28], STAT, STAT_EN
                     );
 end
 endmodule
