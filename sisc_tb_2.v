@@ -8,7 +8,7 @@ module sisc_tb_2;
   parameter    tclk = 10.0;    
   reg          clk;
   reg          rst_f;
-  reg [31:0]   ir;
+  //reg [31:0]   ir;
 
   // component instantiation
   // "uut" stands for "Unit Under Test"
@@ -24,17 +24,18 @@ module sisc_tb_2;
 
   always
   begin
-    #(tclk);
+    #(tclk/2);
     clk = ~clk;
   end
  
   // reset control
   initial 
   begin
-    rst_f = 1;
-    // wait for 20 ns;
-    #20; 
     rst_f = 0;
+    // wait for 10 ns;
+    #10; 
+    rst_f = 1;
+   
   end
 
  

@@ -37,23 +37,26 @@ module ctrl (CLK, RST_F, OPCODE, MM, STAT, RF_WE, ALU_OP, WB_SEL, RD_SEL, PC_SEL
        of RST_F. Notice that the computer is reset when RST_F is low, not high. */
   
 
-initial
-begin
-present_state <= start0;
-next_state <= start0;
-end
+//initial
+//begin
+//present_state <= start0;
+//next_state <= start0;
+//end
 
 
-always @(negedge RST_F)
-begin
+always @(posedge CLK or negedge RST_F)
+  if (!RST_F) begin
   present_state <= start0;
-next_state <= start0;
-end
-
-always @ (posedge CLK)
-  begin
-      present_state <= next_state;
   end
+  else begin
+  present_state <= next_state;
+  end
+
+
+//always @ (posedge CLK)
+  //begin
+    //  present_state <= next_state;
+  //end
 
   
   
@@ -128,8 +131,10 @@ always@(present_state)
       begin
         BR_SEL <= 0;
       end
-      
+     
     end
+    
+    //mem do nothing for now
       
     writeback: begin
 	$display("in case writeback");
