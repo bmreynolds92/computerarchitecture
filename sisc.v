@@ -87,7 +87,7 @@ module sisc( CLK, RST_F );
 
    //monitor signals READ_DATA, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
   initial begin
-	my_rf.ram_array[1] <=32'd1;
+	my_rf.ram_array[1] <=32'd1234;
 	my_rf.ram_array[2] <=32'd0; 
 	end
    initial 

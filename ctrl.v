@@ -21,7 +21,8 @@ module ctrl (CLK, RST_F, OPCODE, MM, STAT, RF_WE, ALU_OP, WB_SEL, RD_SEL, PC_SEL
   output [1:0] ALU_OP;
   reg [1:0] ALU_OP;
   // states
-  parameter start0 = 0, start1 = 1, fetch = 2, decode = 3, execute = 4, mem = 5, writeback = 6;
+  parameter start0 = 0, start1 = 1, fetch = 2, decode = 3;  //, execute = 4, mem = 5, writeback = 6;
+  parameter aluopImm_Execute = 4, aluopImm_Write = 5, aluopReg_Execute=6, aluopReg_Write=7, branchRel=8, branchAbs=9, branchNeg=10, branchX = 11;
    
   // opcodes
   parameter noop = 0, lod = 1, str = 2, alu_op = 8, bra = 4, brr = 5, bne = 6, hlt=15;
@@ -30,7 +31,7 @@ module ctrl (CLK, RST_F, OPCODE, MM, STAT, RF_WE, ALU_OP, WB_SEL, RD_SEL, PC_SEL
   parameter am_imm = 8;
 
   // state registers
-  reg [2:0]  present_state, next_state;
+  reg [5:0]  present_state, next_state;
 
   /* TODO: Write a clock process that progresses the fsm to the next state on the
        positive edge of the clock, OR resets the state to 'start0' on the negative edge
@@ -61,6 +62,7 @@ always @(posedge CLK or negedge RST_F)
   
   
   /* TODO: Write a process that determines the next state of the fsm. */
+/*
   always @ (present_state)
      case (present_state)
         start0: next_state <= start1;
@@ -71,7 +73,7 @@ always @(posedge CLK or negedge RST_F)
         mem: next_state <= writeback;
         writeback: next_state <= fetch;
      endcase
-
+*/
   // Halt on HLT instruction
   always @ (OPCODE)
   begin
@@ -95,118 +97,132 @@ always @(posedge CLK or negedge RST_F)
        add the new control signals here. */
 always@(present_state)
   case(present_state)
-    fetch:  begin
-	$display("in case fetch");
-      PC_WRITE <= 1; //set PC_WRITE high during fetch
-      PC_SEL <=0;  //inc pc to next instruction
-      end
-    decode: begin
-	$display("in case decode");
-      PC_WRITE <= 0; //set PC_WRITE low after fetch
-      RF_WE <= 0;
-	if(OPCODE == alu_op) begin
-		
-      		if (MM == 0) begin
-			ALU_OP<= 2'b00;
-      		end
-      		else if (MM == am_imm) begin
-			ALU_OP <= 2'b01;
-      		end
+	start0: begin
+		$display("in start 0");
+		next_state <= start1;
 	end
-
-	if(OPCODE == brr) begin
-		$display("OPCODE is brr");
-		BR_SEL <= 0;
+	start1: begin
+		$display("in start1");
+//		RST_F <= 1;
+		PC_RST <= 0;
+		next_state <= fetch;
 	end
-	else begin
-		$display("OPCODE is not brr");
-		BR_SEL <= 1;
+	fetch: begin      
+		$display("in fetch");
+		PC_SEL <=0;
+		PC_WRITE <= 1;
+		ALU_OP <= 3;
+		next_state <= decode;
 	end
-    end
-    execute: begin
-	$display("in case execute");
-	WB_SEL <=0;
-/*    case(OPCODE)
-	alu_op:  begin
-      		if (MM == 0) begin
-			ALU_OP<= 2'b00;
-      		end
-      		else if (MM == am_imm) begin
-			ALU_OP <= 2'b01;
-      		end
+	decode: begin
+		$display("in decode");
+		RF_WE <= 0;
+		PC_WRITE <= 0;
+//		case(OPCODE)
+			$display("checking opcode");
+			if(OPCODE == noop) begin
+				$display("noop");
+				next_state <= fetch;
+			end
+			if(OPCODE == alu_op) begin
+				$display("alu_op");
+				if(MM == am_imm) begin
+					$display("immediate operation");
+					next_state <= aluopImm_Execute;
+				end
+				if(MM == 0) begin
+					$display("r-type aluop");
+					next_state <= aluopReg_Execute;
+				end
+			end
+			if(OPCODE == brr) begin
+				$display("branch relative operation");
+				next_state <= branchRel;
+			end
+			if(OPCODE == bra) begin
+				$display("branch absolute operation");
+				next_state <= branchAbs;
+			end
+			if(OPCODE == bne) begin
+				$display("branch negative absolute operation");
+				next_state <= branchNeg;
+			end
+//		endcase
 	end
-    endcase
-  */    //part 2 execute
-      if (( OPCODE == bne)) begin
-	$display("executing branch stuff negative");
-	if ( (MM & STAT) != (MM) ) begin
-		$display("negative condition found, branching");
-		PC_SEL <=1;
-//		PC_WRITE <= 0;
-        end
-        else
-		$display("negative condition not found");
-
-//	next_state <= fetch;
-      end
-      if (( OPCODE == bra || OPCODE == brr )) begin
-	$display("executing branch stuff positive");
-	if ( (MM & STAT) == MM ) begin
-		$display("condition found branching");
-		PC_SEL <=1;
-//		PC_WRITE <= 0;
-        end
-	else begin
-		$display("condition not found");
-	end
-//	next_state <= fetch;
-      end
-//	PC_SEL <= 0;
-     
-    //mem do nothing for now
-     end 
-    writeback: begin
-	$display("in case writeback");
-        PC_WRITE <= 0;
-	case(OPCODE)
-	alu_op:	begin
+	aluopImm_Execute: begin
+		$display("aluopImm_execute");
 		WB_SEL <= 0;
-		RF_WE <=1;
-		if (MM == 0)  begin
-			RD_SEL <=1;
+		ALU_OP <= 2'b01;
+		next_state<= aluopImm_Write;
+	end
+	aluopImm_Write:  begin
+		$display("aluopImm_Write");
+		PC_WRITE <= 0;
+		WB_SEL <= 0;
+		RF_WE <= 1;
+		RD_SEL <= 1;
+		next_state <= fetch;
+	end
+	aluopReg_Execute: begin
+		$display("aluopReg_Execute");
+		WB_SEL = 0;
+		ALU_OP = 2'b00;
+		next_state <= aluopReg_Write;
+	end
+	aluopReg_Write: begin
+		$display("aluopReg_Write");
+		PC_WRITE<=0;
+		WB_SEL<=0;
+		RF_WE<= 1;
+		RD_SEL <=1;
+		next_state<=fetch;
+	end
+	branchRel: begin
+		$display("in branchRel");
+		if(  (MM & STAT) != 0 ) begin
+			$display("branch condition found");
+			BR_SEL <= 0;
+			PC_SEL <=1;
+			WB_SEL <= 0;
+//			PC_WRITE <= 1;
 		end
-		else if (MM == am_imm) begin
-			RD_SEL <= 0;
+		else begin
+			$display("branch condition not found");
 		end
-	end			  
-    endcase
-/*
-if (MM == 0 && OPCODE == alu_op) begin
-	RF_WE <= 1;
-	WB_SEL <= 0;
-	RD_SEL <=1;
+		next_state<= fetch;
 	end
-	  if (MM == am_imm && OPCODE == alu_op) begin
-	  RF_WE <= 1;
-	  WB_SEL <= 0;
-//	  RD_SEL <=0;
-          RD_SEL <=1;
+	branchAbs: begin 
+		$display("in branch abs");
+		if( ( MM & STAT) != 0) begin
+			$display("branch condition found !");
+			BR_SEL <= 1;
+			PC_SEL <=1;
+			WB_SEL <= 0;
+//			PC_WRITE <= 1;
+		end
+		else begin
+			$display("branch condition not found");
+		end
+//		next_state<= branchX;
+		next_state<= fetch;
 	end
-	
-      //part 2 writeback
-      if ((OPCODE == bra) || (OPCODE == bne)) begin 
-	PC_SEL <= 1;
+	branchNeg: begin 
+		$display("in negative absolute branch");
+		if ( (MM & STAT) == 0) begin
+			$display("branch condition found !");
+			BR_SEL <= 1;
+			PC_SEL <=1;
+			WB_SEL <= 0;
+//			PC_WRITE <= 1;
+		end
+		else begin
+			$display("branch condition not found");
+		end
+		next_state<= fetch;
+	end	
+	branchX: begin
+		$display("in branchX");
+		next_state<= fetch;
 	end
-      else
-	PC_SEL <= 0;
-*/	
-      
-      end
-      
   endcase
-	
-  // mem
-    
-  // write back
-
 endmodule

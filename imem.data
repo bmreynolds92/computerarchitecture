@@ -4,20 +4,23 @@
 //
 
 00000000 //00: NOP
-80123001
-48000008
-80113001
-48000006
+80123002 //  : R3 <- R1 - R2
+48000008 //  : BRA(carry test) -> 8
+80213002 //  : R3 <- R2 - R1
+48000006 //  : BRA(carry test) -> 6
+f0000000 //  : halt (should be skipped by previous
+80123001 //  : R3 <- R1 + R2
+51000001 //  : BRR(zero test) -> plus one ahead
+80223001 //  : R3 <- R2 + R2
+51000001 //  : BRR(zero test) -> plus one ahead ie. skip one direction
+f0000000 //  : halt (should be skipped)
+00000000 //  :nop
+80213002 //  : R3 <- R1 -R2
+62000000 //  : BNE(negative) back to start(should not do this)
+80123002 //  : R3 <- R2 -R1
+62000011 //  : BNE(negative) to skip ahead one
 f0000000
-80123001
-51000001
-80223001
-5100000b
-f0000000
-80123002
-6200000a
-80213002
-62000010
-80113001
-F0000000 //0B: HALT
+00000000
+00000000
+F0000000 //0C: HALT
 
