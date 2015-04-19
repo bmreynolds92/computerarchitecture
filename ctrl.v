@@ -126,6 +126,7 @@ always@(present_state)
 			end
 			if(OPCODE == alu_op) begin
 				$display("alu_op");
+				ALU_OP <= (ALU_OP | 10);
 				if(MM == am_imm) begin
 					$display("immediate operation");
 					next_state <= aluopImm_Execute;
@@ -153,6 +154,7 @@ always@(present_state)
 		$display("aluopImm_execute");
 		WB_SEL <= 0;
 		ALU_OP <= 2'b01;
+		RD_SEL <=0;
 		next_state<= aluopImm_Write;
 	end
 	aluopImm_Write:  begin
@@ -160,13 +162,14 @@ always@(present_state)
 		PC_WRITE <= 0;
 		WB_SEL <= 0;
 		RF_WE <= 1;
-		RD_SEL <= 1;
+		RD_SEL <= 0;
 		next_state <= fetch;
 	end
 	aluopReg_Execute: begin
 		$display("aluopReg_Execute");
 		WB_SEL = 0;
 		ALU_OP = 2'b00;
+		RD_SEL = 1;
 		next_state <= aluopReg_Write;
 	end
 	aluopReg_Write: begin

@@ -21,7 +21,7 @@ module sisc( CLK, RST_F );
    //control signals for part2
    wire PC_SEL, PC_WRITE/*aka PC_EN*/, PC_RST, BR_SEL;
 
-   assign MUX32_0 = 32'b11111111111111110001111111111111;
+   assign MUX32_0 = 32'd0;
    //instantiate modules
    alu my_alu( 	.rsa (RSA), 
 		.rsb (RSB), 
@@ -87,14 +87,14 @@ module sisc( CLK, RST_F );
 
    //monitor signals READ_DATA, R1, R2, R3, RD_SEL, ALU_OP, WB_SEL, RF_WE, and WB_DATA
   initial begin
-	my_rf.ram_array[1] <=32'd1234;
-	my_rf.ram_array[2] <=32'd0; 
+//	my_rf.ram_array[1] <=32'd1234;
+//	my_rf.ram_array[2] <=32'd0; 
 	end
    initial 
       begin
 
-         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %h, R1 = %h\n\t R2 = %h, R3 = %h\n\t, R4 = %h \n\t IMMediate = %h\n\t  RD_SEL = %h, ALU_OP = %h,  WB_SEL = %h\n\t, RF_WE = %h, WB_DATA = %h\n\t, MM= %h, ALU_Result = %h\n\t, PC_WRITE = %h,  PC_SEL = %h,  PC_RST = %h,  BR_SEL = %h\n\t BR_ADDR= %h,  PC_OUT  aka READ_ADDR= %h,  PC_INC = %h\n\t   READ_DATA = %h\n\t RST_F = %h\n\t OP_CODE = %h\n\t STAT = %h    STAT_EN = %h\n\n",
-          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], my_rf.ram_array[4], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA, RST_F, READ_DATA[31:28], STAT, STAT_EN
+         $monitor( $time,,,,  "READ_DATA[31:0] = %h\n\t, R0= %h, R1 = %h\n\t R2 = %h, R3 = %h\n\t, R4 = %h \n\t IMMediate = %h\n\t  RD_SEL = %h, ALU_OP = %h,  WB_SEL = %h\n\t, RF_WE = %h, WB_DATA = %h\n\t, MM= %h, ALU_Result = %h\n\t, PC_WRITE = %h,  PC_SEL = %h,  PC_RST = %h,  BR_SEL = %h\n\t BR_ADDR= %h,  PC_OUT  aka READ_ADDR= %h,  PC_INC = %h\n\t   READ_DATA = %h\n\t RST_F = %h\n\t OP_CODE = %h\n\t STAT = %h    STAT_EN = %h\n\t RegA=%h, Regb=%h",
+          READ_DATA, my_rf.ram_array[0], my_rf.ram_array[1], my_rf.ram_array[2], my_rf.ram_array[3], my_rf.ram_array[4], READ_DATA[15:0],  RD_SEL, ALU_OP, WB_SEL, RF_WE, WB_DATA , READ_DATA[27:24], ALU_RESULT, PC_WRITE, PC_SEL, PC_RST, BR_SEL, BR_ADDR, PC_OUT, PC_INC, READ_DATA, RST_F, READ_DATA[31:28], STAT, STAT_EN, my_rf.rsa, my_rf.rsb
                     );
 end
 endmodule
